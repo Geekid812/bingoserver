@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "bingoserver"
+version = "0.1.0"
+description = "Backend for the Trackmania Bingo plugin"
+authors = ["Geekid812 <geekid812@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.8.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
