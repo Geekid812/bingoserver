@@ -81,13 +81,17 @@ class GameRoom:
 
         await self.broadcast(data)
 
-    async def broadcast_claim(self, player, mapname, cellid):
+    async def broadcast_claim(self, player, mapname, cellid, time, medal, improve, delta):
         data = dumps({
             'method': 'CLAIM_CELL',
             'playername': player.name,
             'mapname': mapname,
             'team': player.team,
-            'cellid': cellid
+            'cellid': cellid,
+            'time': time,
+            'medal': medal,
+            'improve': improve,
+            'delta': delta
         })
 
         await self.broadcast(data)

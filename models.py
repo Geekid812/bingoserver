@@ -9,6 +9,7 @@ class TargetMedal:
     GOLD = 1
     SILVER = 2
     BRONZE = 3
+    NONE = 4
 
 class Team:
     RED = 0
@@ -26,3 +27,4 @@ class MapInfo:
     tmxid: int
     uid: str
     team: int = -1
+    time: int = -1
