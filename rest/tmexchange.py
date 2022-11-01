@@ -17,6 +17,8 @@ async def get_random_maps(sess: ClientSession, selection: MapSelection, count: i
         params["mode"] = 25
     elif selection == MapSelection.RANDOM_TMX:
         params["mtype"] = "TM_Race"
+        params["etags"] = "23,37,40"
+        params["vehicles"] = "1"
     else:
         raise ValueError("invalid map selection mode")
     
