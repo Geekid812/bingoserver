@@ -29,6 +29,7 @@ async def join_room(request: web.Request):
     await room.broadcast_update()
     return web.Response(text=dumps({
         'host': room.host.name,
+        'client_secret': player.secret,
         'selection': room.selection,
         'medal': room.medal,
         'size': room.size

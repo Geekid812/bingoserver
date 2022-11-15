@@ -2,10 +2,16 @@ import asyncio
 from aiohttp import web
 
 import routes
-from client import on_client_connection
+from client import ClientTCPSocket
+from server import GameServer
 
 TCP_LISTEN_PORT = 6600
 HTTP_LISTEN_PORT = 8080
+
+
+async def on_client_connection(reader, writer):
+    server = GameServer.instance()
+    server.clients.append(ClientTCPSocket(server, reader, writer))
 
 async def main():
     asyncio.create_task(asyncio.start_server(on_client_connection, port=TCP_LISTEN_PORT))
@@ -17,8 +23,8 @@ async def main():
         web.post('/team-update', routes.team_update),
         web.post('/start', routes.start),
         web.post('/claim', routes.claim_cell),
-        web.get('/rooms', routes.rooms_status)
+        # web.get('/rooms', routes.rooms_status)
     ])
     return app
 
-web.run_app(main(), port=8080)
+web.run_app(main(), port=HTTP_LISTEN_PORT)

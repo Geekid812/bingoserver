@@ -1,7 +1,5 @@
 import asyncio
 
-from server import GameServer
-
 # Represents the TCP connection between a client and the server
 class ClientTCPSocket:
     def __init__(self, server, reader, writer):
@@ -12,7 +10,7 @@ class ClientTCPSocket:
 
         asyncio.create_task(self.connection())
     
-    def matches(self, login):
+    def matches(self, login: str):
         return self.login == login
 
     async def write(self, message):
@@ -32,7 +30,3 @@ class ClientTCPSocket:
         while not self.reader.at_eof():
             await self.write("PING")
             await asyncio.sleep(30) # Ping every 30 seconds
-
-async def on_client_connection(reader, writer):
-    server = GameServer.instance()
-    server.clients.append(ClientTCPSocket(server, reader, writer))

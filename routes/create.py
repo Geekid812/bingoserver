@@ -1,5 +1,6 @@
 import asyncio
 from aiohttp import web
+from json import dumps
 
 from client import ClientTCPSocket
 from server import GameServer
@@ -19,5 +20,8 @@ async def create(request: web.Request):
     room = GameRoom(host, body['size'], body['selection'], body['medal'])
     asyncio.create_task(room.initialize_maplist())
     server.rooms.append(room)
-
-    return web.Response(text=room.code)
+    
+    return web.Response(text=dumps({
+        'room_code': room.code, 
+        'client_secret': host.secret
+    }))

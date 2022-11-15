@@ -1,8 +1,9 @@
 import asyncio
 from string import ascii_uppercase, digits
-from random import choices
+import random
 from json import dumps
 from datetime import datetime
+import secrets
 
 from client import ClientTCPSocket
 from models import MapSelection, TargetMedal, Team, BingoDirection
@@ -15,8 +16,9 @@ class GamePlayer:
         self.socket = socket
         self.name = username
         self.team = team
+        self.secret = secrets.token_urlsafe(16)
 
-    def matches(self, login):
+    def matches(self, login: str):
         return self.socket.matches(login)
 
 class GameRoom:
@@ -27,7 +29,7 @@ class GameRoom:
         self.size = size
         self.selection = selection
         self.medal = medal
-        self.members = []
+        self.members: list[GamePlayer] = []
         self.maplist = []
         self.started = False
         self.created = datetime.utcnow()
@@ -130,4 +132,5 @@ class GameRoom:
                 return await self.broadcast_end(team, BingoDirection.DIAGONAL, 1)
 
 def roomcode_generate():
-    return "".join(choices(ascii_uppercase + digits, k=ROOMCODE_LENGTH))
+    """Generates a random code consisting of uppercase letters and digits"""
+    return "".join(random.choices(ascii_uppercase + digits, k=ROOMCODE_LENGTH))
