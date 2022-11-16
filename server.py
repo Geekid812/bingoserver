@@ -30,14 +30,14 @@ class GameServer:
             if client in [player.socket for player in (room.members + [room.host])]:
                 await room.on_client_disconnect(client)
 
-    def find_client(self, login: str) -> ClientTCPSocket:
+    def find_client(self, secret: str) -> ClientTCPSocket:
         for client in self.clients:
-            if client.matches(login): return client
+            if client.secret == secret: return client
 
-    def find_player(self, login: str) -> tuple[GameRoom, GamePlayer]:
+    def find_player(self, secret: str) -> tuple[GameRoom, GamePlayer]:
         for room in self.rooms:
             for player in (room.members + [room.host]):
-                if player.matches(login):
+                if player.matches(secret):
                     return room, player
         
         return None, None

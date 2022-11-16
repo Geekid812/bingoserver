@@ -9,7 +9,7 @@ from room import GameRoom, GamePlayer
 async def create(request: web.Request):
     body = await request.json()
     server = GameServer.instance()
-    client = server.find_client(body['login'])
+    client = server.find_client(body['client_secret'])
 
     if not client:
         # Client is not connected via the TCP port
@@ -22,6 +22,5 @@ async def create(request: web.Request):
     server.rooms.append(room)
     
     return web.Response(text=dumps({
-        'room_code': room.code, 
-        'client_secret': host.secret
+        'room_code': room.code
     }))

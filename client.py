@@ -1,4 +1,7 @@
 import asyncio
+import secrets
+
+SECRET_LENGTH = 16
 
 # Represents the TCP connection between a client and the server
 class ClientTCPSocket:
@@ -6,20 +9,19 @@ class ClientTCPSocket:
         self.server = server
         self.reader = reader
         self.writer = writer
-        self.login = ""
+        self.secret = secrets.token_urlsafe(SECRET_LENGTH)[0:SECRET_LENGTH]
 
         asyncio.create_task(self.connection())
     
-    def matches(self, login: str):
-        return self.login == login
+    def matches(self, secret: str):
+        return self.secret == secret
 
     async def write(self, message):
         self.writer.write(bytes(message + "\u0004", 'utf8'))
         await self.writer.drain()
 
     async def connection(self):
-        self.login = (await self.reader.readline()).decode('utf8').strip() # Receive login
-        await self.write("OK")
+        await self.write(self.secret)
         asyncio.create_task(self.ping_loop())
 
         await self.reader.read() # Since we are not receiving data afterwards, this blocks until the socket is closed

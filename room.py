@@ -3,7 +3,6 @@ from string import ascii_uppercase, digits
 import random
 from json import dumps
 from datetime import datetime
-import secrets
 
 from client import ClientTCPSocket
 from models import MapSelection, TargetMedal, Team, BingoDirection
@@ -16,11 +15,10 @@ class GamePlayer:
         self.socket = socket
         self.name = username
         self.team = team
-        self.secret = secrets.token_urlsafe(16)
 
-    def matches(self, login: str):
-        return self.socket.matches(login)
-
+    def matches(self, secret: str):
+        return self.socket.matches(secret)
+    
 class GameRoom:
     def __init__(self, host: GamePlayer, size: int, selection: MapSelection, medal: TargetMedal):
         self.server = host.socket.server
@@ -36,6 +34,11 @@ class GameRoom:
     
     async def initialize_maplist(self):
         self.maplist = await get_random_maps(self.server.http, self.selection, 25)
+        if not self.host:
+            return # Room and Player got deleted
+        await asyncio.gather(self.host.socket.write(dumps({
+            'method': 'MAPS_LOADED'
+        })))
     
     async def on_client_disconnect(self, socket):
         for member in self.members:
