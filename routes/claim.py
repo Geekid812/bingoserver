@@ -1,3 +1,4 @@
+from asyncio import sleep
 from aiohttp import web
 from json import loads
 
@@ -11,7 +12,13 @@ async def claim_cell(request: web.Request):
     map_uid = body['uid']
     claim_time = body['time']
     claim_medal = body['medal']
-    cellid, claim_map = [(i, m) for i, m in enumerate(room.maplist) if m.uid == map_uid][0]
+    try:
+        cellid, claim_map = [(i, m) for i, m in enumerate(room.maplist) if m.uid == map_uid][0]
+    except IndexError:
+        # Invalid map uid, it should be a map that's not part of the bingo board
+        print(f"/claim: invalid map uid {map_uid}. claim time: {claim_time}, claim medal: {claim_medal}. \nmap board: {' '.join([m.uid for m in room.maplist])}")
+        await sleep(3000) # Sleep a bit to avoid claim spam from client
+        return web.Response()
 
     if claim_map.time != -1 and claim_map.time <= claim_time: return web.Response(status=204) # Map already claimed
 
