@@ -5,7 +5,7 @@ from json import dumps
 from datetime import datetime
 
 from client import ClientTCPSocket
-from models import MapSelection, TargetMedal, Team, BingoDirection
+from models import MapSelection, TargetMedal, Team, BingoDirection, LoadStatus
 from rest.tmexchange import get_random_maps
 
 ROOMCODE_LENGTH = 6
@@ -30,15 +30,25 @@ class GameRoom:
         self.members: list[GamePlayer] = []
         self.maplist = []
         self.started = False
+        self.mapload_failed = False
         self.created = datetime.utcnow()
     
+    def loading_status(self):
+        if self.mapload_failed: return LoadStatus.LOAD_FAIL
+        if len(self.maplist) >= 25: return LoadStatus.LOAD_SUCCESS
+        return LoadStatus.LOADING
+
     async def initialize_maplist(self):
         self.maplist = await get_random_maps(self.server.http, self.selection, 25)
+        if len(self.maplist) < 25:
+            self.mapload_failed = True
+
         if not self.host:
             return # Room and Player got deleted
-        await asyncio.gather(self.host.socket.write(dumps({
-            'method': 'MAPS_LOADED'
-        })))
+        await self.broadcast(dumps({
+            "method": "MAPS_LOAD_STATUS",
+            "status": self.loading_status()
+        }))
     
     async def on_client_disconnect(self, socket):
         for member in self.members:

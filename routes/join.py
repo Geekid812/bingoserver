@@ -31,5 +31,6 @@ async def join_room(request: web.Request):
         'host': room.host.name,
         'selection': room.selection,
         'medal': room.medal,
-        'size': room.size
+        'size': room.size,
+        'status': room.loading_status()
     }))

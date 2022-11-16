@@ -20,6 +20,11 @@ class BingoDirection:
     VERTICAL = 2
     DIAGONAL = 3
 
+class LoadStatus:
+    LOADING = 0
+    LOAD_SUCCESS = 1
+    LOAD_FAIL = 2
+
 @dataclass
 class MapInfo:
     name: str

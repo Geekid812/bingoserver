@@ -42,13 +42,13 @@ async def get_random_maps(sess: ClientSession, selection: MapSelection, count: i
             )
     
     # Create a pool that fetches random maps one request
-    # at a time (up to 5 simultaneously).
-    tasks = {fetch_map() for _ in range(min(5, count))}
+    # at a time (up to 3 simultaneously).
+    tasks = {fetch_map() for _ in range(min(3, count))}
     reps = 0
     while len(maps) < count:
         if reps > 100:
             # Prevent infinite loop (abort if too many errors)
-            raise RuntimeError()
+            return maps
 
         done, pending = await asyncio.wait(tasks)
         tasks = pending
