@@ -1,6 +1,6 @@
 import asyncio
 from string import ascii_uppercase, digits
-from random import choices
+import random
 from json import dumps
 from datetime import datetime
 
@@ -16,9 +16,9 @@ class GamePlayer:
         self.name = username
         self.team = team
 
-    def matches(self, login):
-        return self.socket.matches(login)
-
+    def matches(self, secret: str):
+        return self.socket.matches(secret)
+    
 class GameRoom:
     def __init__(self, host: GamePlayer, size: int, selection: MapSelection, medal: TargetMedal):
         self.server = host.socket.server
@@ -27,13 +27,18 @@ class GameRoom:
         self.size = size
         self.selection = selection
         self.medal = medal
-        self.members = []
+        self.members: list[GamePlayer] = []
         self.maplist = []
         self.started = False
         self.created = datetime.utcnow()
     
     async def initialize_maplist(self):
         self.maplist = await get_random_maps(self.server.http, self.selection, 25)
+        if not self.host:
+            return # Room and Player got deleted
+        await asyncio.gather(self.host.socket.write(dumps({
+            'method': 'MAPS_LOADED'
+        })))
     
     async def on_client_disconnect(self, socket):
         for member in self.members:
@@ -130,4 +135,5 @@ class GameRoom:
                 return await self.broadcast_end(team, BingoDirection.DIAGONAL, 1)
 
 def roomcode_generate():
-    return "".join(choices(ascii_uppercase + digits, k=ROOMCODE_LENGTH))
+    """Generates a random code consisting of uppercase letters and digits"""
+    return "".join(random.choices(ascii_uppercase + digits, k=ROOMCODE_LENGTH))

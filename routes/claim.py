@@ -5,7 +5,7 @@ from server import GameServer
 
 async def claim_cell(request: web.Request):
     body = loads(await request.text())
-    room, player = GameServer.instance().find_player(body['login'])
+    room, player = GameServer.instance().find_player(body['client_secret'])
     if room is None: return web.Response(status=404)
 
     map_uid = body['uid']
