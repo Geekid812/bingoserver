@@ -1,13 +1,18 @@
 from aiohttp import web
 from json import dumps
 
+from config import REQUIRED_VERSION
 from server import GameServer
 from room import GamePlayer
+from util.version import is_version_greater
 
 async def join_room(request: web.Request):
     body = await request.json()
     server = GameServer.instance()
     client = server.find_client(body['client_secret'])
+
+    if not is_version_greater(REQUIRED_VERSION, body['version']):
+        return web.Response(status=426)
 
     if not client:
         # Client is not connected via the TCP port

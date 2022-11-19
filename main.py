@@ -2,12 +2,9 @@ import asyncio
 from aiohttp import web
 
 import routes
+from config import TCP_LISTEN_PORT, HTTP_LISTEN_PORT
 from client import ClientTCPSocket
 from server import GameServer
-
-TCP_LISTEN_PORT = 6600
-HTTP_LISTEN_PORT = 8080
-
 
 async def on_client_connection(reader, writer):
     server = GameServer.instance()
