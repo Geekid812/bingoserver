@@ -23,12 +23,11 @@ class GameServer:
         self.rooms: list[GameRoom] = []
         self.clients: list[ClientTCPSocket] = []
 
-    async def disconnect(self, client: ClientTCPSocket):
-        client.writer.close()
+    async def remove_client(self, client: ClientTCPSocket):
         self.clients.remove(client)
         for room in self.rooms:
             if client in [player.socket for player in (room.members + [room.host])]:
-                await room.on_client_disconnect(client)
+                await room.on_client_remove(client)
 
     def find_client(self, secret: str) -> ClientTCPSocket:
         for client in self.clients:

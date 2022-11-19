@@ -20,6 +20,7 @@ async def main():
         web.post('/team-update', routes.team_update),
         web.post('/start', routes.start),
         web.post('/claim', routes.claim_cell),
+        web.post('/sync', routes.sync_client),
         # web.get('/rooms', routes.rooms_status)
     ])
     return app

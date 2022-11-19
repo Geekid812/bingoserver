@@ -31,6 +31,7 @@ async def claim_cell(request: web.Request):
 
     claim_map.time = claim_time
     claim_map.team = player.team
+    claim_map.medal = claim_medal
     await room.broadcast_claim(player, claim_map.name, cellid, claim_time, claim_medal, is_improvement, delta)
     await room.check_winner()
     return web.Response()

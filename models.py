@@ -4,7 +4,7 @@ class MapSelection:
     TOTD = 0
     RANDOM_TMX = 1
 
-class TargetMedal:
+class Medal:
     AUTHOR = 0
     GOLD = 1
     SILVER = 2
@@ -31,5 +31,6 @@ class MapInfo:
     author: str
     tmxid: int
     uid: str
-    team: int = -1
+    team: Team = -1
     time: int = -1
+    medal: Medal = Medal.NONE

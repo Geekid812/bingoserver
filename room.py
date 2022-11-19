@@ -5,7 +5,7 @@ from json import dumps
 from datetime import datetime
 
 from client import ClientTCPSocket
-from models import MapSelection, TargetMedal, Team, BingoDirection, LoadStatus
+from models import MapSelection, Medal, Team, BingoDirection, LoadStatus
 from rest.tmexchange import get_random_maps
 
 ROOMCODE_LENGTH = 6
@@ -20,7 +20,7 @@ class GamePlayer:
         return self.socket.matches(secret)
     
 class GameRoom:
-    def __init__(self, host: GamePlayer, size: int, selection: MapSelection, medal: TargetMedal):
+    def __init__(self, host: GamePlayer, size: int, selection: MapSelection, medal: Medal):
         self.server = host.socket.server
         self.code = roomcode_generate()
         self.host = host
@@ -29,10 +29,13 @@ class GameRoom:
         self.medal = medal
         self.members: list[GamePlayer] = []
         self.maplist = []
-        self.started = False
         self.mapload_failed = False
         self.created = datetime.utcnow()
-    
+        self.started = datetime.fromtimestamp(-1)
+
+    def has_started(self):
+        return int(self.started.timestamp()) != -1
+
     def loading_status(self):
         if self.mapload_failed: return LoadStatus.LOAD_FAIL
         if len(self.maplist) >= 25: return LoadStatus.LOAD_SUCCESS
@@ -50,7 +53,7 @@ class GameRoom:
             "status": self.loading_status()
         }))
     
-    async def on_client_disconnect(self, socket):
+    async def on_client_remove(self, socket):
         for member in self.members:
             if member.socket == socket:
                 self.members.remove(member)
@@ -83,6 +86,7 @@ class GameRoom:
     async def broadcast_start(self):
         data = dumps({
             'method': 'GAME_START',
+            'time': self.started.timestamp(),
             'maplist': [
                 {
                     'name': gamemap.name,
