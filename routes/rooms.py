@@ -13,6 +13,18 @@ async def rooms_status(request: web.Request):
             'medal': room.medal,
             'started': room.started,
             'created': str(room.created),
+            'teams': [
+                {
+                    'id': team.id,
+                    'name': team.name,
+                    'color': {
+                        'r': team.color[0],
+                        'g': team.color[1],
+                        'b': team.color[2]
+                    }
+                }
+                for team in room.teams
+            ],
             'members': [
                 member.name
                 for member in room.members

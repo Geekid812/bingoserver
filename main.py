@@ -18,6 +18,7 @@ async def main():
     app.add_routes([
         web.post('/create', routes.create),
         web.post('/join', routes.join_room),
+        web.post('/team-create', routes.team_create),
         web.post('/team-update', routes.team_update),
         web.post('/start', routes.start),
         web.post('/claim', routes.claim_cell),

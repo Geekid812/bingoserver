@@ -9,9 +9,9 @@ from models import MapSelection, Medal, Team, BingoDirection, LoadStatus
 from rest.tmexchange import get_random_maps
 
 ROOMCODE_LENGTH = 6
-
-class GamePlayer:
-    def __init__(self, socket: ClientTCPSocket, username: str, team: int = 0):
+        
+class GamePlayer:    
+    def __init__(self, socket: ClientTCPSocket, username: str, team: GameTeam):
         self.socket = socket
         self.name = username
         self.team = team
@@ -27,14 +27,25 @@ class GameRoom:
         self.size = size
         self.selection = selection
         self.medal = medal
+        self.teams: list[GameTeam] = [
+            GameTeam(index + 1, color[0], color[1])
+            for index, color in enumerate(random.sample(list(GameTeam.colors.items()), 2))
+        ]
+        self.host.team = self.teams[0]
+        
         self.members: list[GamePlayer] = []
         self.maplist = []
         self.mapload_failed = False
         self.created = datetime.utcnow()
-        self.started = datetime.fromtimestamp(-1)
+        self.started: datetime = None
+
+    def find_team(self, id: int) -> GameTeam:
+        for team in self.teams:
+            if team.id == id:
+                return team
 
     def has_started(self):
-        return int(self.started.timestamp()) != -1
+        return self.started is not None
     
     def is_start_intro(self):
         return self.has_started() and self.started > datetime.utcnow()
@@ -75,10 +86,22 @@ class GameRoom:
     async def broadcast_update(self):
         data = dumps({
             'method': 'ROOM_UPDATE',
+            'teams': [
+                {
+                    'id': team.id,
+                    'name': team.name,
+                    'color': {
+                        'r': team.color[0],
+                        'g': team.color[1],
+                        'b': team.color[2]
+                    }
+                }
+                for team in self.teams
+            ],
             'members': [
                 {
                     'name': player.name,
-                    'team': player.team,
+                    'team_id': player.team.id,
                 }
                 for player in (self.members + [self.host])
             ]
@@ -108,7 +131,7 @@ class GameRoom:
             'method': 'CLAIM_CELL',
             'playername': player.name,
             'mapname': mapname,
-            'team': player.team,
+            'team_id': player.team.id,
             'cellid': cellid,
             'time': time,
             'medal': medal,
@@ -118,10 +141,10 @@ class GameRoom:
 
         await self.broadcast(data)
     
-    async def broadcast_end(self, winner_team, direction, offset):
+    async def broadcast_end(self, team: GameTeam, direction, offset):
         data = dumps({
             'method': 'GAME_END',
-            'winner': winner_team,
+            'team_id': team.id,
             'bingodir': direction,
             'offset': offset
         })
@@ -131,23 +154,23 @@ class GameRoom:
     async def check_winner(self):
         # Rows
         for row in range(5):
-            for team in [Team.RED, Team.BLUE]:
+            for team in self.teams:
                 if all([self.maplist[5 * row + i].team == team for i in range(5)]):
                     return await self.broadcast_end(team, BingoDirection.HORIZONTAL, row)
 
         # Columns
         for column in range(5):
-            for team in [Team.RED, Team.BLUE]:
+            for team in self.teams:
                 if all([self.maplist[5 * i + column].team == team for i in range(5)]):
                     return await self.broadcast_end(team, BingoDirection.VERTICAL, column)
 
         # 1st diagonal 
-        for team in [Team.RED, Team.BLUE]:
+        for team in self.teams:
             if all([self.maplist[6 * i].team == team for i in range(5)]):
                 return await self.broadcast_end(team, BingoDirection.DIAGONAL, 0)
         
         # 2nd diagonal
-        for team in [Team.RED, Team.BLUE]:
+        for team in self.teams:
             if all([self.maplist[4 * (i + 1)].team == team for i in range(5)]):
                 return await self.broadcast_end(team, BingoDirection.DIAGONAL, 1)
 

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from gameteam import GameTeam
 
 class MapSelection:
     TOTD = 0
@@ -10,10 +11,6 @@ class Medal:
     SILVER = 2
     BRONZE = 3
     NONE = 4
-
-class Team:
-    RED = 0
-    BLUE = 1
 
 class BingoDirection:
     HORIZONTAL = 1
@@ -31,6 +28,6 @@ class MapInfo:
     author: str
     tmxid: int
     uid: str
-    team: Team = -1
+    team: GameTeam = None
     time: int = -1
     medal: Medal = Medal.NONE

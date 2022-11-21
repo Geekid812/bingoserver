@@ -26,7 +26,7 @@ async def claim_cell(request: web.Request):
     if claim_map.team == player.team: is_improvement = True
 
     delta = -1
-    if claim_map.team != -1:
+    if claim_map.team:
         delta = claim_map.time - claim_time
 
     claim_map.time = claim_time

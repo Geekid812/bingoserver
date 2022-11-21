@@ -28,7 +28,7 @@ async def join_room(request: web.Request):
     
     player = GamePlayer(client, body['name'])
     # Quick way to sort new players into different teams
-    if len(room.members) % 2 == 0: player.team = 1
+    player.team = room.teams[room.len(room.members) % len(room.teams)]
 
     room.members.append(player)
     await room.broadcast_update()

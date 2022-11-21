@@ -32,7 +32,19 @@ async def sync_client(request: web.Request):
         'medal': room.medal,
         'size': room.size,
         'status': room.loading_status(),
-        'started': (int((datetime.utcnow().timestamp() - room.started.timestamp()) * 1000) if int(room.started.timestamp()) != -1 else -1),
+        'started': (int((datetime.utcnow().timestamp() - room.started.timestamp()) * 1000) if room.started is not None else -1),
+        'teams': [
+            {
+                'id': team.id,
+                'name': team.name,
+                'color': {
+                    'r': team.color[0],
+                    'g': team.color[1],
+                    'b': team.color[2]
+                }
+            }
+            for team in room.teams
+        ],
         'players': [
             {
                 'name': player.name,
@@ -47,7 +59,7 @@ async def sync_client(request: web.Request):
                 'tmxid': gamemap.tmxid,
                 'uid': gamemap.uid,
                 'claim': (None if gamemap.time == -1 else {
-                    'team': gamemap.team,
+                    'team_id': gamemap.team,
                     'time': gamemap.time,
                     'medal': gamemap.medal
                 })

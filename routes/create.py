@@ -20,12 +20,24 @@ async def create(request: web.Request):
         # Client is not connected via the TCP port
         return web.Response(status=400)
 
-    host = GamePlayer(client, body['name'])
+    host = GamePlayer(client, body['name'], None)
 
     room = GameRoom(host, body['size'], body['selection'], body['medal'])
     asyncio.create_task(room.initialize_maplist())
     server.rooms.append(room)
     
     return web.Response(text=dumps({
-        'room_code': room.code
+        'room_code': room.code,
+        'teams': [
+            {
+                'id': team.id,
+                'name': team.name,
+                'color': {
+                    'r': team.color[0],
+                    'g': team.color[1],
+                    'b': team.color[2]
+                }
+            }
+            for team in room.teams
+        ]
     }))
