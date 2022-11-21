@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 
-from rest import USER_AGENT
+from config import USER_AGENT
 from room import GamePlayer, GameRoom
 from client import ClientTCPSocket
 
