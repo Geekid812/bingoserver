@@ -35,6 +35,9 @@ class GameRoom:
 
     def has_started(self):
         return int(self.started.timestamp()) != -1
+    
+    def is_start_intro(self):
+        return self.has_started() and self.started > datetime.utcnow()
 
     def loading_status(self):
         if self.mapload_failed: return LoadStatus.LOAD_FAIL
