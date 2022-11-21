@@ -5,7 +5,8 @@ from json import dumps
 from datetime import datetime
 
 from client import ClientTCPSocket
-from models import MapSelection, Medal, Team, BingoDirection, LoadStatus
+from models import MapSelection, Medal, BingoDirection, LoadStatus
+from gameteam import GameTeam
 from rest.tmexchange import get_random_maps
 
 ROOMCODE_LENGTH = 6
