@@ -26,14 +26,18 @@ class ClientTCPSocket:
         await self.write(self.secret)
         asyncio.create_task(self.ping_loop())
 
-        await self.reader.read() # Since we are not receiving data afterwards, this blocks until the socket is closed
+        try:
+            await self.reader.read() # Since we are not receiving data afterwards, this blocks until the socket is closed
+        except ConnectionResetError: # Handle disconnect
+            pass
         
         self.writer.close()
         self.reader, self.writer = None, None
-        await asyncio.sleep(120) # Allow reconnection for 120 seconds
+        if not self.closed: # skip if already closed
+            await asyncio.sleep(30) # Allow reconnection for 30 seconds
+            if self in self.server.clients:
+                await self.server.remove_client(self)
 
-        if not self.closed:
-            await self.server.remove_client(self)
 
     async def ping_loop(self):
         await asyncio.sleep(5)

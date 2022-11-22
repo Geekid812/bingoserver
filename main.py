@@ -23,6 +23,7 @@ async def main():
         web.post('/start', routes.start),
         web.post('/claim', routes.claim_cell),
         web.post('/sync', routes.sync_client),
+        web.post('/leave', routes.leave),
 
         # Private routes
         web.get('/internal/rooms', routes.rooms_status)

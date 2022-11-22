@@ -4,6 +4,7 @@ import random
 from json import dumps
 from datetime import datetime
 
+from config import ROOMCODE_CHARACTERS
 from client import ClientTCPSocket
 from models import MapSelection, Medal, BingoDirection, LoadStatus
 from gameteam import GameTeam
@@ -12,7 +13,7 @@ from rest.tmexchange import get_random_maps
 ROOMCODE_LENGTH = 6
         
 class GamePlayer:    
-    def __init__(self, socket: ClientTCPSocket, username: str, team: GameTeam):
+    def __init__(self, socket: ClientTCPSocket, username: str, team: GameTeam = None):
         self.socket = socket
         self.name = username
         self.team = team
@@ -68,20 +69,24 @@ class GameRoom:
             "status": self.loading_status()
         }))
     
-    async def on_client_remove(self, socket):
-        for member in self.members:
-            if member.socket == socket:
-                self.members.remove(member)
-                await self.broadcast_update()
-        
-        if self.host.socket == socket:
+    async def on_client_remove(self, socket: ClientTCPSocket):
+        if self.host and self.host.socket == socket:
             self.host = None
-            # TODO: disconnect all
-            socket.server.rooms.remove(self)
+            if not self.has_started(): # Only close room if not started yet
+                socket.server.rooms.remove(self)
+                for member in self.members:
+                    member.socket.closed = True
+                await self.broadcast_close() # final message
+        else:
+            for member in self.members:
+                if member.socket == socket:
+                    self.members.remove(member)
+                    await self.broadcast_update()
+
     
     async def broadcast(self, message: str):
         await asyncio.gather(*[
-            player.socket.write(message) for player in (self.members + [self.host])
+            player.socket.write(message) for player in (self.members + [self.host]) if player
         ])
 
     async def broadcast_update(self):
@@ -104,7 +109,7 @@ class GameRoom:
                     'name': player.name,
                     'team_id': player.team.id,
                 }
-                for player in (self.members + [self.host])
+                for player in (self.members + [self.host]) if player
             ]
         })
 
@@ -125,6 +130,13 @@ class GameRoom:
             ]
         })
 
+        await self.broadcast(data)
+
+    async def broadcast_close(self):
+        data = dumps({
+            'method': 'ROOM_CLOSED'    
+        })
+        
         await self.broadcast(data)
 
     async def broadcast_claim(self, player, mapname, cellid, time, medal, improve, delta):
@@ -177,4 +189,4 @@ class GameRoom:
 
 def roomcode_generate():
     """Generates a random code consisting of uppercase letters and digits"""
-    return "".join(random.choices(ascii_uppercase + digits, k=ROOMCODE_LENGTH))
+    return "".join(random.choices(ROOMCODE_CHARACTERS, k=ROOMCODE_LENGTH))

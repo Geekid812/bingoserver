@@ -27,7 +27,7 @@ async def sync_client(request: web.Request):
     await server.remove_client(old_client)
 
     return web.Response(text=dumps({
-        'host': room.host.name,
+        'host': room.host and room.host.name,
         'selection': room.selection,
         'medal': room.medal,
         'size': room.size,
@@ -48,9 +48,9 @@ async def sync_client(request: web.Request):
         'players': [
             {
                 'name': player.name,
-                'team': player.team,
+                'team_id': player.team.id,
             }
-            for player in (room.members + [room.host])
+            for player in (room.members + [room.host]) if player
         ],
         'boardstate': ([] if not room.started else [
             {
@@ -59,7 +59,7 @@ async def sync_client(request: web.Request):
                 'tmxid': gamemap.tmxid,
                 'uid': gamemap.uid,
                 'claim': (None if gamemap.time == -1 else {
-                    'team_id': gamemap.team,
+                    'team_id': gamemap.team.id,
                     'time': gamemap.time,
                     'medal': gamemap.medal
                 })

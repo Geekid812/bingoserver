@@ -7,7 +7,7 @@ async def rooms_status(request: web.Request):
     server = GameServer.instance()
     return web.Response(text=dumps([
         {
-            'host': room.host.name,
+            'host': room.host and room.host.name,
             'size': room.size,
             'selection': room.selection,
             'medal': room.medal,

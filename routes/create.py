@@ -2,7 +2,7 @@ import asyncio
 from aiohttp import web
 from json import dumps
 
-from config import REQUIRED_VERSION
+from config import REQUIRED_VERSION, MAX_ROOM_TEAM_COUNT
 from client import ClientTCPSocket
 from server import GameServer
 from room import GameRoom, GamePlayer
@@ -20,14 +20,15 @@ async def create(request: web.Request):
         # Client is not connected via the TCP port
         return web.Response(status=400)
 
-    host = GamePlayer(client, body['name'], None)
-
+    host = GamePlayer(client, body['name'])
     room = GameRoom(host, body['size'], body['selection'], body['medal'])
+
     asyncio.create_task(room.initialize_maplist())
     server.rooms.append(room)
     
     return web.Response(text=dumps({
         'room_code': room.code,
+        'max_teams': MAX_ROOM_TEAM_COUNT,
         'teams': [
             {
                 'id': team.id,

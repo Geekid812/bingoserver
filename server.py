@@ -26,7 +26,7 @@ class GameServer:
     async def remove_client(self, client: ClientTCPSocket):
         self.clients.remove(client)
         for room in self.rooms:
-            if client in [player.socket for player in (room.members + [room.host])]:
+            if client in [player.socket for player in (room.members + [room.host]) if player]:
                 await room.on_client_remove(client)
 
     def find_client(self, secret: str) -> ClientTCPSocket:
@@ -36,7 +36,7 @@ class GameServer:
     def find_player(self, secret: str) -> tuple[GameRoom, GamePlayer]:
         for room in self.rooms:
             for player in (room.members + [room.host]):
-                if player.matches(secret):
+                if player and player.matches(secret):
                     return room, player
         
         return None, None
