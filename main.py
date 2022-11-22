@@ -24,7 +24,8 @@ async def main():
         web.post('/sync', routes.sync_client),
 
         # Private routes
-        web.get('/internal/rooms', routes.rooms_status)
+        web.get('/internal/rooms', routes.rooms_status),
+        web.get('/internal/clients', routes.clients_status)
     ])
     return app
 
