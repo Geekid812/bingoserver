@@ -11,8 +11,8 @@ from gameteam import GameTeam
 from rest.tmexchange import get_random_maps
 
 ROOMCODE_LENGTH = 6
-        
-class GamePlayer:    
+
+class GamePlayer:
     def __init__(self, socket: ClientTCPSocket, username: str, team: GameTeam = None):
         self.socket = socket
         self.name = username
