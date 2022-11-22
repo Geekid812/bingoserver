@@ -34,7 +34,7 @@ class ClientTCPSocket:
         await self.reader.read() # Since we are not receiving data afterwards, this blocks until the socket is closed
         
         self.opened = False
-        self.reader, self.writer = None # Drop reader and writer
+        self.reader, self.writer = None, None # Drop reader and writer
         await asyncio.sleep(RECONNECT_TIMEOUT) # After this timeout, client is fully disconnected
 
         if not self.opened:
