@@ -11,7 +11,7 @@ async def rooms_status(request: web.Request):
             'size': room.size,
             'selection': room.selection,
             'medal': room.medal,
-            'started': room.started,
+            'started': str(room.started),
             'created': str(room.created),
             'members': [
                 member.name
