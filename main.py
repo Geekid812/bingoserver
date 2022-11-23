@@ -26,7 +26,8 @@ async def main():
         web.post('/leave', routes.leave),
 
         # Private routes
-        web.get('/internal/rooms', routes.rooms_status)
+        web.get('/internal/rooms', routes.rooms_status),
+        web.get('/internal/clients', routes.clients_status)
     ])
     return app
 

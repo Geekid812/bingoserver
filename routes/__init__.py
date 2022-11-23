@@ -6,4 +6,5 @@ from .claim import claim_cell
 from .sync import sync_client
 from .leave import leave
 
-from .rooms import rooms_status
+from .internal.rooms import rooms_status
+from .internal.clients import clients_status

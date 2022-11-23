@@ -22,7 +22,7 @@ async def sync_client(request: web.Request):
     
     # Swap old and new client connections
     old_client = player.socket
-    old_client.closed = True
+    old_client.opened = False
     player.socket = client
     await server.remove_client(old_client)
 

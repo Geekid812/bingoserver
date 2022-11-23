@@ -24,7 +24,8 @@ class GameServer:
         self.clients: list[ClientTCPSocket] = []
 
     async def remove_client(self, client: ClientTCPSocket):
-        self.clients.remove(client)
+        if client in self.clients:
+            self.clients.remove(client)
         for room in self.rooms:
             if client in [player.socket for player in (room.members + [room.host]) if player]:
                 await room.on_client_remove(client)
