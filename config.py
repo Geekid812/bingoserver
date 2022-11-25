@@ -1,7 +1,7 @@
 from os import environ
 
 # Tuple of (MAJOR, MINOR) minimum plugin version
-REQUIRED_VERSION = (1, 0)
+REQUIRED_VERSION = (1, 1)
 
 # TCP port for streaming events to clients
 TCP_LISTEN_PORT = 6600

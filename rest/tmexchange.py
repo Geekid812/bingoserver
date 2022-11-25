@@ -1,5 +1,6 @@
 import asyncio
 import json
+import traceback
 from aiohttp import ClientSession
 
 from models import MapSelection, MapInfo
@@ -50,15 +51,19 @@ async def get_random_maps(sess: ClientSession, selection: MapSelection, count: i
             # Prevent infinite loop (abort if too many errors)
             return maps
 
-        done, pending = await asyncio.wait(tasks)
-        tasks = pending
+        try:
+            done, pending = await asyncio.wait(tasks)
+            tasks = pending
 
-        for task in done:
-            if res := task.result():
-                maps.append(res)
+            for task in done:
+                if res := task.result():
+                    maps.append(res)
 
-        if len(maps) + len(tasks) < count:
-            tasks.add(fetch_map())
+            if len(maps) + len(tasks) < count:
+                tasks.add(fetch_map())
+        except Exception as e:
+            traceback.print_exception(e)
+            break
         reps += 1
     
     return maps
