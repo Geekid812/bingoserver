@@ -28,7 +28,7 @@ async def sync_client(request: web.Request):
 
     return web.Response(text=dumps({
         'host': room.host.name,
-        'selection': room.selection,
+        'selection': room.selection.mode,
         'medal': room.medal,
         'size': room.size,
         'status': room.loading_status(),

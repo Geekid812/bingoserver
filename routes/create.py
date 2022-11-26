@@ -6,6 +6,7 @@ from config import REQUIRED_VERSION
 from client import ClientTCPSocket
 from server import GameServer
 from room import GameRoom, GamePlayer
+from models import MapSelection
 from util.version import is_version_greater
 
 async def create(request: web.Request):
@@ -22,7 +23,10 @@ async def create(request: web.Request):
 
     host = GamePlayer(client, body['name'])
 
-    room = GameRoom(host, body['size'], body['selection'], body['medal'])
+    selection = MapSelection(body['selection'])
+    if 'mappack_id' in body: selection.mappack_id = body['mappack_id']
+
+    room = GameRoom(host, body['size'], selection, body['medal'])
     asyncio.create_task(room.initialize_maplist())
     server.rooms.append(room)
     
