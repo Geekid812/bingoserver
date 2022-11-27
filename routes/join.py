@@ -34,7 +34,7 @@ async def join_room(request: web.Request):
     await room.broadcast_update()
     return web.Response(text=dumps({
         'host': room.host and room.host.name,
-        'selection': room.selection,
+        'selection': room.selection.mode,
         'medal': room.medal,
         'size': room.size,
         'status': room.loading_status()

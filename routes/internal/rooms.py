@@ -9,7 +9,7 @@ async def rooms_status(request: web.Request):
         {
             'host': room.host and room.host.name,
             'size': room.size,
-            'selection': room.selection,
+            'selection': room.selection.mode,
             'medal': room.medal,
             'started': str(room.started),
             'created': str(room.created),

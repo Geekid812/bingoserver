@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from gameteam import GameTeam
 
-class MapSelection:
+class MapMode:
     TOTD = 0
     RANDOM_TMX = 1
+    MAPPACK = 2
 
 class Medal:
     AUTHOR = 0
@@ -21,6 +22,11 @@ class LoadStatus:
     LOADING = 0
     LOAD_SUCCESS = 1
     LOAD_FAIL = 2
+
+@dataclass
+class MapSelection:
+    mode: MapMode
+    mappack_id: str = None
 
 @dataclass
 class MapInfo:

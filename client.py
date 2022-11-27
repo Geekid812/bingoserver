@@ -22,12 +22,13 @@ class ClientTCPSocket:
         return self.secret == secret
 
     async def write(self, message):
-        if self.opened is None: return
+        if not self.opened: return
         self.writer.write(bytes(message + "\u0004", 'utf8'))
         await self.writer.drain()
 
     async def connection(self):
         self.opened = True
+
         await self.write(self.secret)
         asyncio.create_task(self.ping_loop())
 
