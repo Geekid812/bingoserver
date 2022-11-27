@@ -2,7 +2,7 @@ import asyncio
 from aiohttp import web
 from json import dumps
 
-from config import REQUIRED_VERSION
+from config import REQUIRED_VERSION, MAX_ROOM_TEAM_COUNT
 from client import ClientTCPSocket
 from server import GameServer
 from room import GameRoom, GamePlayer
@@ -27,9 +27,23 @@ async def create(request: web.Request):
     if 'mappack_id' in body: selection.mappack_id = body['mappack_id']
 
     room = GameRoom(host, body['size'], selection, body['medal'])
+
     asyncio.create_task(room.initialize_maplist())
     server.rooms.append(room)
     
     return web.Response(text=dumps({
-        'room_code': room.code
+        'room_code': room.code,
+        'max_teams': MAX_ROOM_TEAM_COUNT,
+        'teams': [
+            {
+                'id': team.id,
+                'name': team.name,
+                'color': {
+                    'r': team.color[0],
+                    'g': team.color[1],
+                    'b': team.color[2]
+                }
+            }
+            for team in room.teams
+        ]
     }))

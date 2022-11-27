@@ -17,3 +17,8 @@ USER_AGENT = "Bingoserver " + environ.get("USERAGENT_MOTD", "(Development)")
 
 # Developer Restricted API key
 SECRET_KEY = environ.get("SECRET_KEY", "")
+
+# Maximum number of teams per room. Don't set this higher than available colors in GameTeam.
+MAX_ROOM_TEAM_COUNT = 6
+
+ROOMCODE_CHARACTERS = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'T', 'U', 'V', 'W', 'X', 'Y', '3', '4', '6', '7', '9']

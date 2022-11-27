@@ -22,23 +22,35 @@ async def sync_client(request: web.Request):
     
     # Swap old and new client connections
     old_client = player.socket
-    old_client.closed = True
+    old_client.opened = False
     player.socket = client
     await server.remove_client(old_client)
 
     return web.Response(text=dumps({
-        'host': room.host.name,
+        'host': room.host and room.host.name,
         'selection': room.selection.mode,
         'medal': room.medal,
         'size': room.size,
         'status': room.loading_status(),
-        'started': (int((datetime.utcnow().timestamp() - room.started.timestamp()) * 1000) if int(room.started.timestamp()) != -1 else -1),
+        'started': (int((datetime.utcnow().timestamp() - room.started.timestamp()) * 1000) if room.started is not None else -1),
+        'teams': [
+            {
+                'id': team.id,
+                'name': team.name,
+                'color': {
+                    'r': team.color[0],
+                    'g': team.color[1],
+                    'b': team.color[2]
+                }
+            }
+            for team in room.teams
+        ],
         'players': [
             {
                 'name': player.name,
-                'team': player.team,
+                'team_id': player.team.id,
             }
-            for player in (room.members + [room.host])
+            for player in (room.members + [room.host]) if player
         ],
         'boardstate': ([] if not room.started else [
             {
@@ -47,7 +59,7 @@ async def sync_client(request: web.Request):
                 'tmxid': gamemap.tmxid,
                 'uid': gamemap.uid,
                 'claim': (None if gamemap.time == -1 else {
-                    'team': gamemap.team,
+                    'team_id': gamemap.team.id,
                     'time': gamemap.time,
                     'medal': gamemap.medal
                 })
