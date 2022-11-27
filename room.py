@@ -4,13 +4,12 @@ import random
 from json import dumps
 from datetime import datetime
 
-from config import ROOMCODE_CHARACTERS
+from config import ROOMCODE_CHARACTERS, ROOMCODE_LENGTH
 from client import ClientTCPSocket
 from models import MapSelection, Medal, BingoDirection, LoadStatus
 from gameteam import GameTeam
 from rest.tmexchange import get_random_maps
 
-ROOMCODE_LENGTH = 6
 
 class GamePlayer:
     def __init__(self, socket: ClientTCPSocket, username: str, team: GameTeam = None):
