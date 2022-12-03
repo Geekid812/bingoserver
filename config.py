@@ -26,3 +26,6 @@ ROOMCODE_CHARACTERS = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N
 
 # Number of characters in a room code
 ROOMCODE_LENGTH = 6
+
+# Verbose logging of HTTP requests
+VERBOSE = True

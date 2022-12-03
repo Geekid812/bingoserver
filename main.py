@@ -2,10 +2,11 @@ import asyncio
 from aiohttp import web
 
 import routes
-from config import TCP_LISTEN_PORT, HTTP_LISTEN_PORT
+from config import TCP_LISTEN_PORT, HTTP_LISTEN_PORT, VERBOSE
 from client import ClientTCPSocket
 from server import GameServer
-from auth import authenticate
+from util.auth import authenticate
+from util.verbose import logging
 
 async def on_client_connection(reader, writer):
     server = GameServer.instance()
@@ -14,7 +15,10 @@ async def on_client_connection(reader, writer):
 async def main():
     asyncio.create_task(asyncio.start_server(on_client_connection, port=TCP_LISTEN_PORT))
 
-    app = web.Application(middlewares=[authenticate])
+    mdw = [authenticate]
+    if VERBOSE:
+        mdw.append(logging)
+    app = web.Application(middlewares=mdw)
     app.add_routes([
         web.post('/create', routes.create),
         web.post('/join', routes.join_room),
