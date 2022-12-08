@@ -8,6 +8,7 @@ async def claim_cell(request: web.Request):
     body = loads(await request.text())
     room, player = GameServer.instance().find_player(body['client_secret'])
     if room is None: return web.Response(status=404)
+    if not room.has_started() or room.is_start_intro(): return web.Response(status=406)
 
     map_uid = body['uid']
     claim_time = body['time']

@@ -29,6 +29,8 @@ class GameServer:
         for room in self.rooms:
             if client in [player.socket for player in (room.members + [room.host]) if player]:
                 await room.on_client_remove(client)
+                if len([player for player in room.members + [room.host] if player]) == 0:
+                    self.rooms.remove(room)
 
     def find_client(self, secret: str) -> ClientTCPSocket:
         for client in self.clients:

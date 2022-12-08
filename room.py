@@ -154,6 +154,7 @@ class GameRoom:
         await self.broadcast(data)
     
     async def broadcast_end(self, team: GameTeam, direction, offset):
+        self.started = None
         data = dumps({
             'method': 'GAME_END',
             'team_id': team.id,
@@ -162,6 +163,7 @@ class GameRoom:
         })
 
         await self.broadcast(data)
+        await self.initialize_maplist()
 
     async def check_winner(self):
         # Rows
