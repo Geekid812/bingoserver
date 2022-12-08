@@ -118,7 +118,8 @@ class GameRoom:
                     'uid': gamemap.uid
                 }
                 for gamemap in self.maplist
-            ]
+            ],
+            'has_started': self.has_started()
         })
 
         await self.broadcast(data)
