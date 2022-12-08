@@ -109,6 +109,15 @@ class GameRoom:
                     'team_id': player.team.id,
                 }
                 for player in (self.members + [self.host]) if player
+            ],
+            'maplist': [
+                {
+                    'name': gamemap.name,
+                    'author': gamemap.author,
+                    'tmxid': gamemap.tmxid,
+                    'uid': gamemap.uid
+                }
+                for gamemap in self.maplist
             ]
         })
 

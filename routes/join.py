@@ -19,18 +19,21 @@ async def join_room(request: web.Request):
         return web.Response(status=400)
 
     room = server.find_room(body['code'])
+    isExistingMember = len([member for member in room.members if member.get('name')==body['name']]) > 0
     if not room:
         return web.Response(status=204) # Room not found
     if len(room.members) + 1 >= room.size:
         return web.Response(status=298) # Room is full
-    if room.has_started():
+    if room.has_started() and not isExistingMember:
         return web.Response(status=299) # Already started
-    
-    player = GamePlayer(client, body['name'])
-    # Quick way to sort new players into different teams
-    player.team = room.teams[(len(room.members) + 1) % len(room.teams)]
 
-    room.members.append(player)
+    if not isExistingMember:
+        player = GamePlayer(client, body['name'])
+        # Quick way to sort new players into different teams
+        player.team = room.teams[(len(room.members) + 1) % len(room.teams)]
+
+        room.members.append(player)
+    
     await room.broadcast_update()
     return web.Response(text=dumps({
         'host': room.host and room.host.name,
