@@ -73,9 +73,9 @@ class GameRoom:
             self.host = None
             if not self.has_started(): # Only close room if not started yet
                 socket.server.rooms.remove(self)
+                await self.broadcast_close()
                 for member in self.members:
                     member.socket.opened = False
-                await self.broadcast_close() # final message
         else:
             for member in self.members:
                 if member.socket == socket:
@@ -154,6 +154,7 @@ class GameRoom:
         await self.broadcast(data)
     
     async def broadcast_end(self, team: GameTeam, direction, offset):
+        self.started = None
         data = dumps({
             'method': 'GAME_END',
             'team_id': team.id,
@@ -162,6 +163,7 @@ class GameRoom:
         })
 
         await self.broadcast(data)
+        await self.initialize_maplist()
 
     async def check_winner(self):
         # Rows

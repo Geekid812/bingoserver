@@ -38,8 +38,9 @@ class ClientTCPSocket:
             pass
         
         self.reader, self.writer = None, None # Drop reader and writer
-        self.opened = False
-        await asyncio.sleep(RECONNECT_TIMEOUT) # After this timeout, client is fully disconnected
+        if self.opened: # Don't try to reconnect if the client has already disconnected
+            self.opened = False
+            await asyncio.sleep(RECONNECT_TIMEOUT) # After this timeout, client is fully disconnected
         await self.server.remove_client(self)
 
     async def ping_loop(self):
