@@ -20,10 +20,13 @@ async def join_room(request: web.Request):
 
     room = server.find_room(body['code'])
     if not room:
+        client.opened = False
         return web.Response(status=204) # Room not found
     if len(room.members) + 1 >= room.size:
+        client.opened = False
         return web.Response(status=298) # Room is full
     if room.has_started():
+        client.opened = False
         return web.Response(status=299) # Already started
     
     player = GamePlayer(client, body['name'])
