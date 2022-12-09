@@ -73,9 +73,9 @@ class GameRoom:
             self.host = None
             if not self.has_started(): # Only close room if not started yet
                 socket.server.rooms.remove(self)
+                await self.broadcast_close()
                 for member in self.members:
                     member.socket.opened = False
-                await self.broadcast_close() # final message
         else:
             for member in self.members:
                 if member.socket == socket:

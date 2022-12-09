@@ -26,10 +26,11 @@ class GameServer:
     async def remove_client(self, client: ClientTCPSocket):
         if client in self.clients:
             self.clients.remove(client)
+            client.opened = False # prevent reconnection attempt
         for room in self.rooms:
             if client in [player.socket for player in (room.members + [room.host]) if player]:
                 await room.on_client_remove(client)
-                if len([player for player in room.members + [room.host] if player]) == 0:
+                if not room.host and len(room.members) == 0 and room in self.rooms:
                     self.rooms.remove(room)
 
     def find_client(self, secret: str) -> ClientTCPSocket:
